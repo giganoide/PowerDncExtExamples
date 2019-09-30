@@ -1,0 +1,33 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.645
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "010_Empty", "010_Empty\010_Empty.csproj", "{BA86EDAF-9E50-47FA-90C4-96AB1FECA64F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dependencies", "Dependencies", "{077E79C3-DAE4-496A-9D98-ECD969161401}"
+	ProjectSection(SolutionItems) = preProject
+		Dependencies\Atys.PowerDNC.Contracts.dll = Dependencies\Atys.PowerDNC.Contracts.dll
+		Dependencies\Atys.PowerDNC.Contracts.xml = Dependencies\Atys.PowerDNC.Contracts.xml
+		Dependencies\Atys.PowerDNC.Foundation.dll = Dependencies\Atys.PowerDNC.Foundation.dll
+		Dependencies\Atys.PowerDNC.Foundation.XML = Dependencies\Atys.PowerDNC.Foundation.XML
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BA86EDAF-9E50-47FA-90C4-96AB1FECA64F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BA86EDAF-9E50-47FA-90C4-96AB1FECA64F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BA86EDAF-9E50-47FA-90C4-96AB1FECA64F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BA86EDAF-9E50-47FA-90C4-96AB1FECA64F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0926603C-1F66-435C-98F6-4DC66CE80BE7}
+	EndGlobalSection
+EndGlobal
