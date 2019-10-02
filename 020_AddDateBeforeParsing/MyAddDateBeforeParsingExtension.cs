@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
-using System.Text;
-using System.Text.RegularExpressions;
 using Atys.PowerDNC.Extensibility;
 using Atys.PowerDNC.Foundation;
 
@@ -12,44 +10,9 @@ namespace TeamSystem.Customizations
         "TeamSystem", "TeamSystem")]
     public class MyAddDateBeforeParsingExtension : IDncExtension
     {
-        #region Fields
-
-        private IDncManager _DncManager = null;
-
-        private const string LOGGERSOURCE = @"MyAddDateBeforeParsingExtension";
-
-        #endregion
-
-        public MyAddDateBeforeParsingExtension()
-        {
-        }
-
-        #region Iterface Implementations
-
-        public void Initialize(IDncManager dncManager)
-        {
-#if DEBUG
-            Debugger.Launch();
-#endif
-            this._DncManager = dncManager;
-        }
-
-        public void Run()
-        {
-            this._DncManager.SerialCommEngine.BeforeCommandParsing += SerialCommEngine_BeforeCommandParsing;
-        }
-
-        public void Shutdown()
-        {
-            this._DncManager.SerialCommEngine.BeforeCommandParsing -= SerialCommEngine_BeforeCommandParsing;
-            this._DncManager = null;
-        }
-
-        #endregion
-
         #region Event Handling
 
-        void SerialCommEngine_BeforeCommandParsing(object sender, FileOnChannelEventArgs e)
+        private void SerialCommEngine_BeforeCommandParsing(object sender, FileOnChannelEventArgs e)
         {
             var fullPath = e.FullPath;
             string line = null;
@@ -60,20 +23,11 @@ namespace TeamSystem.Customizations
             var file = new StreamReader(fullPath);
             while ((line = file.ReadLine()) != null)
             {
-                if (line.Contains("#S"))
-                {
-                    savefound++;
-                }
+                if (line.Contains("#S")) savefound++;
 
-                if (line.Contains("#C"))
-                {
-                    loadfound++;
-                }
+                if (line.Contains("#C")) loadfound++;
 
-                if ((line.Contains("M30")) || (line.Contains("M02")) || (line.Contains("M2")))
-                {
-                    finefound++;
-                }
+                if (line.Contains("M30") || line.Contains("M02") || line.Contains("M2")) finefound++;
             }
 
             file.Close();
@@ -86,7 +40,7 @@ namespace TeamSystem.Customizations
                     if (line.Contains("#S"))
                     {
                         line = null;
-                        line = "(#S" + " " + DateTime.Today.ToString() + " #)";
+                        line = "(#S" + " " + DateTime.Today + " #)";
                     }
 
                     file_write.WriteLine(line);
@@ -101,18 +55,49 @@ namespace TeamSystem.Customizations
 
         #endregion
 
+        #region Fields
+
+        private IDncManager _DncManager;
+
+        private const string LOGGERSOURCE = @"MyAddDateBeforeParsingExtension";
+
+        #endregion
+
+        #region Iterface Implementations
+
+        public void Initialize(IDncManager dncManager)
+        {
+#if DEBUG
+            Debugger.Launch();
+#endif
+            _DncManager = dncManager;
+        }
+
+        public void Run()
+        {
+            _DncManager.SerialCommEngine.BeforeCommandParsing += SerialCommEngine_BeforeCommandParsing;
+        }
+
+        public void Shutdown()
+        {
+            _DncManager.SerialCommEngine.BeforeCommandParsing -= SerialCommEngine_BeforeCommandParsing;
+            _DncManager = null;
+        }
+
+        #endregion
+
         #region Elaboration
 
         public void InsertFileDate(string fullPath)
         {
             try
             {
-                StreamReader fileSaved = new StreamReader(fullPath);
-                string line = string.Empty;
-                string newFile = string.Empty;
+                var fileSaved = new StreamReader(fullPath);
+                var line = string.Empty;
+                var newFile = string.Empty;
 
                 //Leggo e scrivo i primi tre blocchi
-                for (int i = 1; i <= 5; ++i)
+                for (var i = 1; i <= 5; ++i)
                 {
                     line = fileSaved.ReadLine();
                     newFile = newFile + line + Environment.NewLine;
@@ -120,7 +105,7 @@ namespace TeamSystem.Customizations
                 }
 
                 //Inserisco la data
-                newFile = newFile + "(DATA ULTIMO SALVATAGGIO) (" + this.GetFileDate(fullPath) + ")" +
+                newFile = newFile + "(DATA ULTIMO SALVATAGGIO) (" + GetFileDate(fullPath) + ")" +
                           Environment.NewLine;
 
                 //Leggo e scrivo fino in fondo al file saltando l'eventuale blocco con la data
@@ -140,26 +125,26 @@ namespace TeamSystem.Customizations
             catch (Exception ex)
             {
                 var message = $"Sub InsertFileDate : {DateTime.Now} {ex}";
-                this._DncManager.AppendMessageToLog(MessageLevel.Error, LOGGERSOURCE, message);
+                _DncManager.AppendMessageToLog(MessageLevel.Error, LOGGERSOURCE, message);
             }
         }
 
         /// <summary>
-        /// Ricava la data in  formato stringa GG-MM-AA del file passato
+        ///     Ricava la data in  formato stringa GG-MM-AA del file passato
         /// </summary>
         /// <param name="fullPath">Percorso completo file</param>
         /// <returns></returns>
         private string GetFileDate(string fullPath)
         {
-            string result = string.Empty;
+            var result = string.Empty;
 
             try
             {
-                DateTime lastDate = File.GetLastWriteTime(fullPath);
+                var lastDate = File.GetLastWriteTime(fullPath);
 
-                result = lastDate.Date.Day.ToString() + "." +
-                         lastDate.Month.ToString() + "." +
-                         lastDate.Year.ToString();
+                result = lastDate.Date.Day + "." +
+                         lastDate.Month + "." +
+                         lastDate.Year;
             }
             catch (Exception ex)
             {
