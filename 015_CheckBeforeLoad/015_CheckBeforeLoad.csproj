@@ -7,8 +7,8 @@
     <ProjectGuid>{F43A34C8-E365-4AF9-9DA2-3C7604D827E9}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>_015_CheckBeforeLoad</RootNamespace>
-    <AssemblyName>015_CheckBeforeLoad</AssemblyName>
+    <RootNamespace>TeamSystem.Customizations</RootNamespace>
+    <AssemblyName>PowerDncCheckBeforeLoad.DncExt</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
