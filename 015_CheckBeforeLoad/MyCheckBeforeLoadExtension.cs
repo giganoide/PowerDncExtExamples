@@ -1,14 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.IO;
-using Atys.PowerDNC.Foundation;
-using Atys.PowerDNC.Extensibility;
-using System.Text.RegularExpressions;
 using System.Diagnostics;
+using System.IO;
+using System.Text;
+using System.Text.RegularExpressions;
+using Atys.PowerDNC.Extensibility;
+using Atys.PowerDNC.Foundation;
 
-namespace Atys.Customers.Meccalte
+namespace TeamSystem.Customizations
 {
     [ExtensionData("MyCheckBeforeLoadExtension", "Gestore trasmissioni", "1.0",
         "TeamSystem", "TeamSystem")]

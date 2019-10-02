@@ -15,6 +15,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dependencies", "Dependencie
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "015_CheckBeforeLoad", "015_CheckBeforeLoad\015_CheckBeforeLoad.csproj", "{F43A34C8-E365-4AF9-9DA2-3C7604D827E9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "020_AddDateBeforeParsing", "020_AddDateBeforeParsing\020_AddDateBeforeParsing.csproj", "{64344FCB-26C3-40FE-BD32-1B85D017BAC7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,6 +31,10 @@ Global
 		{F43A34C8-E365-4AF9-9DA2-3C7604D827E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F43A34C8-E365-4AF9-9DA2-3C7604D827E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F43A34C8-E365-4AF9-9DA2-3C7604D827E9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{64344FCB-26C3-40FE-BD32-1B85D017BAC7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{64344FCB-26C3-40FE-BD32-1B85D017BAC7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{64344FCB-26C3-40FE-BD32-1B85D017BAC7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{64344FCB-26C3-40FE-BD32-1B85D017BAC7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
