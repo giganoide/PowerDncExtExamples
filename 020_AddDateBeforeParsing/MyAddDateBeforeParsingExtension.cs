@@ -10,6 +10,37 @@ namespace TeamSystem.Customizations
         "TeamSystem", "TeamSystem")]
     public class MyAddDateBeforeParsingExtension : IDncExtension
     {
+        #region Fields
+
+        private IDncManager _DncManager;
+
+        private const string LOGGERSOURCE = @"MyAddDateBeforeParsingExtension";
+
+        #endregion
+
+        #region Iterface Implementations
+
+        public void Initialize(IDncManager dncManager)
+        {
+#if DEBUG
+            Debugger.Launch();
+#endif
+            _DncManager = dncManager;
+        }
+
+        public void Run()
+        {
+            _DncManager.SerialCommEngine.BeforeCommandParsing += SerialCommEngine_BeforeCommandParsing;
+        }
+
+        public void Shutdown()
+        {
+            _DncManager.SerialCommEngine.BeforeCommandParsing -= SerialCommEngine_BeforeCommandParsing;
+            _DncManager = null;
+        }
+
+        #endregion
+
         #region Event Handling
 
         private void SerialCommEngine_BeforeCommandParsing(object sender, FileOnChannelEventArgs e)
@@ -54,44 +85,14 @@ namespace TeamSystem.Customizations
         }
 
         #endregion
-
-        #region Fields
-
-        private IDncManager _DncManager;
-
-        private const string LOGGERSOURCE = @"MyAddDateBeforeParsingExtension";
-
-        #endregion
-
-        #region Iterface Implementations
-
-        public void Initialize(IDncManager dncManager)
-        {
-#if DEBUG
-            Debugger.Launch();
-#endif
-            _DncManager = dncManager;
-        }
-
-        public void Run()
-        {
-            _DncManager.SerialCommEngine.BeforeCommandParsing += SerialCommEngine_BeforeCommandParsing;
-        }
-
-        public void Shutdown()
-        {
-            _DncManager.SerialCommEngine.BeforeCommandParsing -= SerialCommEngine_BeforeCommandParsing;
-            _DncManager = null;
-        }
-
-        #endregion
-
+        
         #region Elaboration
 
         public void InsertFileDate(string fullPath)
         {
             try
             {
+                var lastWriteTime = File.GetLastWriteTime(fullPath).ToString("d.M.yyyy");
                 var fileSaved = new StreamReader(fullPath);
                 var line = string.Empty;
                 var newFile = string.Empty;
@@ -105,8 +106,7 @@ namespace TeamSystem.Customizations
                 }
 
                 //Inserisco la data
-                newFile = newFile + "(DATA ULTIMO SALVATAGGIO) (" + GetFileDate(fullPath) + ")" +
-                          Environment.NewLine;
+                newFile = newFile + "(DATA ULTIMO SALVATAGGIO) (" + lastWriteTime + ")" + Environment.NewLine;
 
                 //Leggo e scrivo fino in fondo al file saltando l'eventuale blocco con la data
                 //che è già stata inserita.
@@ -127,32 +127,6 @@ namespace TeamSystem.Customizations
                 var message = $"Sub InsertFileDate : {DateTime.Now} {ex}";
                 _DncManager.AppendMessageToLog(MessageLevel.Error, LOGGERSOURCE, message);
             }
-        }
-
-        /// <summary>
-        ///     Ricava la data in  formato stringa GG-MM-AA del file passato
-        /// </summary>
-        /// <param name="fullPath">Percorso completo file</param>
-        /// <returns></returns>
-        private string GetFileDate(string fullPath)
-        {
-            var result = string.Empty;
-
-            try
-            {
-                var lastDate = File.GetLastWriteTime(fullPath);
-
-                result = lastDate.Date.Day + "." +
-                         lastDate.Month + "." +
-                         lastDate.Year;
-            }
-            catch (Exception ex)
-            {
-                //    this.AppendTextToLog(this._LogFileFullPath, "Sub GetFileDate : " + DateTime.Now + " " + ex);
-            }
-
-
-            return result;
         }
 
         #endregion
