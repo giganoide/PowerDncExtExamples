@@ -56,6 +56,13 @@ namespace TeamSystem.Customizations
         /// caricati ed inizializzati con gli EndPoints assegnati</remarks>
         public void Run()
         {
+            /*
+             *in questo punto posso agganciarmi agli eventi dei motori di comunicazione
+             * oppure a quello di notifica inizializzazione generale
+             * completata e da qui utilizzare ciò che serve
+             *
+             */
+
             this._DncManager.Initialized += this._DncManager_Initialized;
         }
 

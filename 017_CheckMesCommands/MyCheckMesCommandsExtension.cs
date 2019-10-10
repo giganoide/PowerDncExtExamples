@@ -6,8 +6,10 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using Atys.PowerDNC.Commands;
 using Atys.PowerDNC.Extensibility;
 using Atys.PowerDNC.Foundation;
+using Atys.PowerDNC.Settings;
 
 namespace TeamSystem.Customizations
 {
@@ -35,22 +37,25 @@ namespace TeamSystem.Customizations
 
         public void Run()
         {
-            _DncManager.SerialCommEngine.BeforeLoadCommand += SerialCommEngine_BeforeLoadCommand;
+            this._DncManager.SerialCommEngine.BeforeLoadCommand += this.SerialCommEngine_BeforeLoadCommand;
+            this._DncManager.SerialCommEngine.BeforeDncCommand += this.SerialCommEngine_BeforeDncCommand;
+            this._DncManager.SerialCommEngine.DncCommandRaised += this.SerialCommEngine_DncCommandRaised;
+            this._DncManager.SerialCommEngine.CommandParseCompleted += this.SerialCommEngine_CommandParseCompleted;
         }
-
         public void Shutdown()
         {
-            _DncManager.SerialCommEngine.BeforeLoadCommand -= SerialCommEngine_BeforeLoadCommand;
-            _DncManager = null;
+            this._DncManager.SerialCommEngine.BeforeLoadCommand -= this.SerialCommEngine_BeforeLoadCommand;
+            this._DncManager.SerialCommEngine.BeforeDncCommand -= this.SerialCommEngine_BeforeDncCommand;
+            this._DncManager.SerialCommEngine.DncCommandRaised -= this.SerialCommEngine_DncCommandRaised;
         }
 
         #endregion
 
-        #region Event Handling
-        
+        #region verifica presenza comandi MES su caricamento file
+
         private void SerialCommEngine_BeforeLoadCommand(object sender, FileShortOnChannelCancelEventArgs e)
         {
-            //discrimino se devo gestire l'evento di valutazione comandoi MES
+            //discrimino se devo gestire l'evento di valutazione comandi MES
 
             var attributes = e.Channel.Settings.Customization.Attributes;
 
@@ -58,7 +63,7 @@ namespace TeamSystem.Customizations
             if (!evaluateMesCmd)
                 return;
 
-            var mesType = attributes.GetString("MES_TYPE");
+            var mesType = attributes.GetString("MES_TYPE"); //in un attributo ho la regex per la ricerca dei comandi
             if (string.IsNullOrWhiteSpace(mesType))
                 return;
 
@@ -90,10 +95,10 @@ namespace TeamSystem.Customizations
 
             var fileToLoad = Path.Combine(e.Channel.GetTxPath(), e.ShortName) + ".cnc";
             var fileContent = File.ReadAllText(fileToLoad);
-            var WordMatch = Regex.Matches(fileContent, mesType);
+            var wordMatch = Regex.Matches(fileContent, mesType);
 
             //Se ho almeno due comandi MES procedo, diversamente cancello l'evento ed invio messaggio all'operatore.
-            if (WordMatch.Count < 2)
+            if (wordMatch.Count < 2)
             {
                 e.Cancel = true;
                 e.Channel.SendMessage("(COMANDI MES NON PRESENTI");
@@ -101,6 +106,99 @@ namespace TeamSystem.Customizations
         }
 
         #endregion
+
+        #region utilizzo comandi custom su ricezione file
+
+        /*
+         * se utilizzo comandi custom (e ad esempio me li aspetto sempre),
+         * può essere utile fare una verifica della presenza degli stessi
+         * sulla ricezione al termine della ricerca di tutti i comandi.
+         * La srtinga identificativa di un comando non viene memorizzata
+         * in testo semplice, ma come stringa che contiene la sequenza dei codici ascii
+         * separati da spazi
+         *
+         * NB: gli eventi sono generati in modo centralizzato
+         *     dall'engine per tutti i suoi EndPoint:
+         *     testare Id EndPoint e valutare se usare lock
+         */
+
+        private void SerialCommEngine_CommandParseCompleted(object sender, CommandParsingEventArgs e)
+        {
+            /*
+             * L'elenco dei comandi estratti contiene solo comandi validi
+             * (definiti nelle opzioni)
+             */
+
+            if (e.Channel.EndPoint.Id == 0)
+            {
+                //comandi custom che mi aspetto
+                var endPointCustomCommands = e.Channel.Settings.Commands.Commands
+                                              .Where(c => c.Command == CommandType.Custom).Select(c => c.TextCharCodes)
+                                              .ToList();
+
+                //comandi custom trovati nel file ricevuto
+                var extractedCommands = e.Commands?.ToList() ?? new List<ExtractedCommand>();
+                var myCommandsCount = extractedCommands.Select(c => c.Command.TextCharCodes).Count();
+
+                //ESEMPIO 1: mi servono tutti i comandi
+                var foundAll = myCommandsCount == endPointCustomCommands.Count;
+                if (!foundAll)
+                {
+                    //TODO: notifico qualcuno?
+                }
+
+                //ESEMPIO 2: mi basta trovare almeno un comando custom 
+                var foundOne = myCommandsCount > 0;
+                if (!foundOne)
+                {
+                    //TODO: notifico qualcuno?
+                }
+
+                //ESEMPIO 3: ne voglio uno specifico
+                const string lookingForCommand = @"67 85 83 84 79 77 49"; //= CUSTOM1
+                var foundSpecific = extractedCommands.Any(c => c.Command.TextCharCodes == lookingForCommand);
+                if (!foundSpecific)
+                {
+                    //TODO: notifico qualcuno?
+                }
+            }
+        }
+
+
+        /*
+         * per ogni singolo comando custom rilevato nel programma, vengono
+         * generati i due eventi seguenti
+         */
+
+        private void SerialCommEngine_BeforeDncCommand(object sender, DncCancelCommandEventArgs e)
+        {
+            if (e.Channel.EndPoint.Id == 0 && e.Command.DisplayName == "CUSTOM1")
+            {
+                //eventuale verifica dei parametri del comando
+                //come previsti da settings EndPoint
+                var arguments = e.Arguments?.ToList() ?? new List<string>();
+                //AD ESEMPIO se mi aspetto esattamente due parametri:
+                e.Cancel = arguments.Count != 2;
+            }
+
+            //questo per tutti i comandi custom da gestire...
+        }
+
+        private void SerialCommEngine_DncCommandRaised(object sender, DncCommandEventArgs e)
+        {
+            if (e.Channel.EndPoint.Id == 0 && e.Command.DisplayName == "CUSTOM1")
+            {
+                var arguments = e.Arguments?.ToList() ?? new List<string>();
+
+                //TODO: codie per gestire il comando custom
+
+            }
+
+            //questo per tutti i comandi custom da gestire...
+        }
+
+        #endregion
+
     }
 
     public static class AttributeValueContainerExtensionMethods
