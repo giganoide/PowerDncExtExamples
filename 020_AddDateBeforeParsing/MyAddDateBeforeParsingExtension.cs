@@ -54,9 +54,9 @@ namespace TeamSystem.Customizations
             var file = new StreamReader(fullPath);
             while ((line = file.ReadLine()) != null)
             {
-                if (line.Contains("#S")) savefound++;
+                if (line.Contains("X00S") || line.Contains("X00 S")) savefound++;
 
-                if (line.Contains("#C")) loadfound++;
+                if (line.Contains("X00C") || line.Contains("X00 C")) loadfound++;
 
                 if (line.Contains("M30") || line.Contains("M02") || line.Contains("M2")) finefound++;
             }
@@ -68,11 +68,8 @@ namespace TeamSystem.Customizations
                 var file_write = new StreamWriter(fullPath + "123");
                 while ((line = file_read.ReadLine()) != null)
                 {
-                    if (line.Contains("#S"))
-                    {
-                        line = null;
-                        line = "(#S" + " " + DateTime.Today + " #)";
-                    }
+                    if (line.Contains("X00S") || line.Contains("X00 S"))
+                        line = "(X00 S" + " " + DateTime.Today + " X11)";
 
                     file_write.WriteLine(line);
                 }
@@ -102,7 +99,7 @@ namespace TeamSystem.Customizations
                 {
                     line = fileSaved.ReadLine();
                     newFile = newFile + line + Environment.NewLine;
-                    if (line.Contains("#S")) i = 7;
+                    if (line != null && (line.Contains("X00S") || line.Contains("X00 S"))) i = 7;
                 }
 
                 //Inserisco la data

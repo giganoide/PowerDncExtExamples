@@ -100,8 +100,8 @@ namespace TeamSystem.Customizations
             var strfileToLoad = File.ReadAllText(fullPath);
 
             //Verifico se ho due "%"
-            var WordMatch = Regex.Matches(strfileToLoad, "%");
-            var countPercent = WordMatch.Count;
+            //var WordMatch = Regex.Matches(strfileToLoad, "%");
+            //var countPercent = WordMatch.Count;
 
             //Verifico se contiene il comando salva
             if (!strfileToLoad.Contains(startCmd + "S") && !strfileToLoad.Contains(startCmd + " S"))
@@ -129,8 +129,8 @@ namespace TeamSystem.Customizations
                     }
 
                     //Verifico se aggiungere il % finale
-                    if (countPercent < 2)
-                        strfileToLoad = strfileToLoad + "%" + Environment.NewLine;
+                    //if (countPercent < 2)
+                    //    strfileToLoad = strfileToLoad + "%" + Environment.NewLine;
 
                     //Chiudo il file aperto
                     fileToload.Close();
@@ -149,8 +149,8 @@ namespace TeamSystem.Customizations
             else
             {
                 //Verifico se aggiungere il % finale
-                if (countPercent < 2)
-                    File.AppendAllText(fullPath, Environment.NewLine + "%");
+                //if (countPercent < 2)
+                //    File.AppendAllText(fullPath, Environment.NewLine + "%");
             }
 
             return result;
